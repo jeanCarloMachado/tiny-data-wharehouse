@@ -7,7 +7,7 @@ import pandas as pd
 DEFAULT_FOLDER = os.path.join(os.environ['HOME'], '.tinyws')
 DEFAULT_EVENTS_FOLDER = os.path.join(DEFAULT_FOLDER, 'events')
 
-class DataWharehouse:
+class DataWarehouse:
     def __init__(self, events_folder: Optional[str] = None, supported_events: Optional[List[str]]=None) -> None:
         if not events_folder:
             events_folder = DEFAULT_EVENTS_FOLDER
@@ -71,7 +71,7 @@ class DataWharehouse:
 
 def main():
     import fire
-    fire.Fire(DataWharehouse)
+    fire.Fire(DataWarehouse)
 
 if __name__ == "__main__":
     main()
