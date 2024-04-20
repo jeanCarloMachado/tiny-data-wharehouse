@@ -11,7 +11,7 @@ class DataWharehouse:
     def __init__(self, events_folder: Optional[str] = None, supported_events: Optional[List[str]]=None) -> None:
         if not events_folder:
             events_folder = DEFAULT_EVENTS_FOLDER
-            print("Given that no events_folder was given, the default folder will be used: {}".format(events_folder))
+            #print("Given that no events_folder was given, the default folder will be used: {}".format(events_folder))
 
         if not os.path.exists(events_folder):
             os.makedirs(events_folder)
@@ -30,6 +30,8 @@ class DataWharehouse:
     def write_event(self, event_name, event: Optional[str]) -> None:
         """
         if event is a dict every key will be a column in the parquet file
+
+        Adds a column tdw_timestamp to the event
         """
         if type(event) != dict:
             raise ValueError('event must be a dictionary got {}'.format(type(event)))
@@ -39,6 +41,7 @@ class DataWharehouse:
         if os.path.exists(self._parquet_file(event_name)):
             df = pd.concat([pd.read_parquet(self._parquet_file(event_name)), df])
         df.to_parquet(self._parquet_file(event_name))
+        print(f"Event {event_name} written successfully")
 
 
     def event(self, event_name: Optional[str]) -> pd.DataFrame:
