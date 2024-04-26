@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tiny-data-warehouse"
-version = "0.1.3"
+version = "0.1.4"
 description = ""
 authors = ["Jean Carlo Machado <jean.machado@getyourguide.com>"]
 readme = "README.md"
@@ -19,4 +19,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-tinydw = 'tiny_data_wharehouse.data_wharehouse:main'
+tinydw = 'tiny_data_warehouse.data_warehouse:main'
+tdw = 'tiny_data_warehouse.data_warehouse:main'
