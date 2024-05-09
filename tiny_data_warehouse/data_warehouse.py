@@ -16,7 +16,7 @@ class DataWarehouse:
             
         self.base_folder = DataWarehouse.DEFAULT_FOLDER
         self.events_folder = events_folder
-        self.events_config = events_config
+        self.events_config = events_config if events_config else {}
         if events_config:
             print("Events config given: ", events_config)
 
@@ -32,7 +32,7 @@ class DataWarehouse:
         self._validate_event_data(event_data)
 
         event_data['tdw_timestamp'] = pd.Timestamp.now()
-        new_df = pd.DataFrame([event_data])
+        df = pd.DataFrame([event_data])
 
         if self._exists_data(event_name):
             existing_data = self.event(event_name)
@@ -45,7 +45,7 @@ class DataWarehouse:
                 if possible_duplicated_value in existing_data[check_column_name].values:
                     raise ValueError(f"A duplicated value {event_data[check_column_name]} for key {check_column_name} was found in the event {event_name}")
 
-            df = pd.concat([existing_data, new_df])
+            df = pd.concat([existing_data, df])
 
         if not dry_run:
             self._write_df(event_name, df)
@@ -92,7 +92,8 @@ class DataWarehouse:
     
     def _parquet_file(self, event_name):
         return os.path.join(self.events_folder, event_name + '.parquet')
-        
+
+
 
 def main():
     import fire
