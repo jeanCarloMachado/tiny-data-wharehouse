@@ -10,7 +10,7 @@ pip install tiny-data-warehouse
 
 ```py
 
-from tiny_data_wharehouse import DataWarehouse
+from tiny_data_warehouse import DataWarehouse
 import pandas as pd
 
 # write event
