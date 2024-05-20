@@ -1,2 +1,1 @@
-
 from tiny_data_warehouse.data_warehouse import DataWarehouse
