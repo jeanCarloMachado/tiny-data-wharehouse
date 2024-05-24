@@ -8,6 +8,7 @@
             <JupyterConnectionParameters>
               <option name="managed" value="true" />
               <option name="sdkHomePath" value="$USER_HOME$/miniconda3/envs/python310/bin/python" />
+              <option name="sdkName" value="python310" />
             </JupyterConnectionParameters>
           </value>
         </entry>

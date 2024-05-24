@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Poetry (tiny-data-wharehouse)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (tiny-data-wharehouse)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (tiny-data-warehouse)" project-jdk-type="Python SDK" />
 </project>

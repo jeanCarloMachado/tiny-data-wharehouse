@@ -22,7 +22,8 @@ class DataWarehouse:
             print("Events config given: ", events_config)
 
     def list_stored_events(self):
-        os.system("ls -l {}".format(self.events_folder))
+        print("Stored events in folder:  ", self.events_folder)
+        os.system("ls -lh {}".format(self.events_folder))
 
     def write_event(
         self, event_name: str, event_data: dict, verbose=False, dry_run=False
@@ -82,6 +83,12 @@ class DataWarehouse:
         Reads the data from the event returned as a pandas DataFrame
         """
         if not os.path.exists(self._parquet_file(event_name)):
+            if os.environ.get("TINYWS_CREATE_EMPTY_WHEN_NOT_FOUND"):
+                print(
+                    "Event {} not found, creating an empty one".format(event_name)
+                )
+                return pd.DataFrame()
+
             raise ValueError("Event {} does not exist".format(event_name))
 
         df = pd.read_parquet(self._parquet_file(event_name))
@@ -112,6 +119,24 @@ class DataWarehouse:
 
     def _parquet_file(self, event_name):
         return os.path.join(self.events_folder, event_name + ".parquet")
+
+    def backup_all(self):
+        date_and_time_str = pd.Timestamp.now().strftime("%Y-%m-%d_%H-%M-%S")
+        os.system(f"mkdir -p {self.events_folder}.backup/{date_and_time_str}")
+        os.system(f"cp -r {self.events_folder}/* {self.events_folder}.backup/{date_and_time_str}")
+        print("Backup done in folder: ", f"{self.events_folder}.backup/{date_and_time_str}")
+
+    def backup_restore(self, date_and_time_str, dry_run=True):
+        cmd = f"cp -r {self.events_folder}.backup/{date_and_time_str}/* {self.events_folder}"
+        if dry_run:
+            print(f"Dry run restore of the backup {date_and_time_str}. Disable dry run to execute it")
+            print(cmd)
+            return
+        os.system(cmd)
+        print("Backup restored")
+
+    def backups_list(self):
+        os.system(f"du -hs  {self.events_folder}.backup/*")
 
 
 def main():
