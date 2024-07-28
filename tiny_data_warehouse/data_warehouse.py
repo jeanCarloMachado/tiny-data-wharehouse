@@ -1,10 +1,12 @@
 import os
-
 from typing import Optional
 import pandas as pd
-
+import uuid
 
 class DataWarehouse:
+    """
+    A minimal data warehouse to use in your python projects
+    """
     DEFAULT_FOLDER = os.path.join(os.environ["HOME"], ".tinyws")
     DEFAULT_EVENTS_FOLDER = os.path.join(DEFAULT_FOLDER, "events")
 
@@ -21,6 +23,23 @@ class DataWarehouse:
         if events_config:
             print("Events config given: ", events_config)
 
+    def event(self, event_name: Optional[str]) -> pd.DataFrame:
+        """
+        Reads the data from the event returned as a pandas DataFrame
+        """
+        if not os.path.exists(self._parquet_file(event_name)):
+            if os.environ.get("TINYWS_CREATE_EMPTY_WHEN_NOT_FOUND"):
+                print(
+                    "Event {} not found, creating an empty one".format(event_name)
+                )
+                return pd.DataFrame()
+
+            raise ValueError("Event {} does not exist".format(event_name))
+
+        df = pd.read_parquet(self._parquet_file(event_name))
+
+        return df
+
     def list_stored_events(self):
         print("Stored events in folder:  ", self.events_folder)
         os.system("ls -lh {}".format(self.events_folder))
@@ -36,6 +55,8 @@ class DataWarehouse:
         self._validate_event_data(event_data)
 
         event_data["tdw_timestamp"] = pd.Timestamp.now()
+        event_data['tdw_uuid'] = str(uuid.uuid4())
+
         df = pd.DataFrame([event_data])
 
         if self._exists_data(event_name):
@@ -78,22 +99,6 @@ class DataWarehouse:
     def _exists_data(self, event_name: str) -> bool:
         return os.path.exists(self._parquet_file(event_name))
 
-    def event(self, event_name: Optional[str]) -> pd.DataFrame:
-        """
-        Reads the data from the event returned as a pandas DataFrame
-        """
-        if not os.path.exists(self._parquet_file(event_name)):
-            if os.environ.get("TINYWS_CREATE_EMPTY_WHEN_NOT_FOUND"):
-                print(
-                    "Event {} not found, creating an empty one".format(event_name)
-                )
-                return pd.DataFrame()
-
-            raise ValueError("Event {} does not exist".format(event_name))
-
-        df = pd.read_parquet(self._parquet_file(event_name))
-
-        return df
 
     def replace_df(self, event_name: str, df: pd.DataFrame, dry_run=True) -> None:
         if dry_run:

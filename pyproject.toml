@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tiny-data-warehouse"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["Jean Carlo Machado <jean.machado@getyourguide.com>"]
 readme = "README.md"
