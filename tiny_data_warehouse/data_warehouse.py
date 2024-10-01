@@ -6,6 +6,11 @@ import uuid
 class DataWarehouse:
     """
     A minimal data warehouse to use in your python projects
+
+    Main apis
+    event()
+    write_event()
+    replace_df()
     """
     DEFAULT_FOLDER = os.path.join(os.environ["HOME"], ".tinyws")
     DEFAULT_EVENTS_FOLDER = os.path.join(DEFAULT_FOLDER, "events")
@@ -46,7 +51,7 @@ class DataWarehouse:
 
     def write_event(
         self, event_name: str, event_data: dict, verbose=False, dry_run=False
-    ) -> None:
+    ) -> str:
         """
         if event is a dict every key will be a column in the parquet file
 
@@ -55,7 +60,8 @@ class DataWarehouse:
         self._validate_event_data(event_data)
 
         event_data["tdw_timestamp"] = pd.Timestamp.now()
-        event_data['tdw_uuid'] = str(uuid.uuid4())
+        tdw_uuid = str(uuid.uuid4())
+        event_data['tdw_uuid'] = tdw_uuid
 
         df = pd.DataFrame([event_data])
 
@@ -86,6 +92,7 @@ class DataWarehouse:
 
         if verbose:
             print(f"Event {event_name} written successfully")
+        return tdw_uuid
 
     def _write_df(self, event_name, df):
         df.to_parquet(self._parquet_file(event_name))
