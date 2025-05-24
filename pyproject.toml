@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "tiny-data-warehouse"
-version = "0.2.3"
+version = "0.2.4"
 description = ""
 authors = ["Jean Carlo Machado <jean.machado@getyourguide.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
+python = ">=3.12,<4.0"
 pandas = "*"
 fire = "*"
 pypdf2 = "*"
