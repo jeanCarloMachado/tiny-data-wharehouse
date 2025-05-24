@@ -10,7 +10,6 @@ python = ">=3.12,<4.0"
 pandas = "*"
 fire = "*"
 pypdf2 = "*"
-jupyter = "*"
 matplotlib = "*"
 pyarrow = "*"
 
