@@ -24,11 +24,14 @@ df = tdw.event('person')
 df.head() # reads as pandas dataframe
 ```
 
-or like a table
 
-rom tiny_data_warehouse.base_table import BaseTable
+### Table format
+
+
+or like a table:
 
 ```py
+from tiny_data_warehouse.base_table import BaseTable
 
 class TestTable(BaseTable):
     table_name = "test_table"
