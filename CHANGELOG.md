@@ -1,3 +1,6 @@
+# 0.3.0
+
+add base table option
 
 # 0.2.2
 - Return uuid on save event
