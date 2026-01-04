@@ -61,7 +61,6 @@ class BaseTable:
         import pandas as pd
 
         df = pd.DataFrame()
-
         self.twd.replace_df(self.table_name, df, dry_run=True)
 
     def replace(self, df, dry_run=True):

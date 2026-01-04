@@ -118,6 +118,7 @@ class DataWarehouse:
         lock_path = self._parquet_file(event_name) + ".lock"
         with FileLock(lock_path, timeout=30):
             df.to_parquet(self._parquet_file(event_name))
+        print(f"Event {event_name} replaced successfully")
 
     def remove_event(self, event_name: str, dry_run=True) -> None:
         if dry_run:
@@ -152,6 +153,20 @@ class DataWarehouse:
 
     def backups_list(self):
         os.system(f"du -hs  {self.events_folder}.backup/*")
+    
+    def version(self):
+        os.system("pip list | grep tiny-data-warehouse")
+    
+
+    def reset(self, table_name: str, dry_run=True):
+        if dry_run:
+            print("Dry run enabled exitting")
+            return
+
+        import pandas as pd
+
+        df = pd.DataFrame()
+        self.replace_df(table_name, df, dry_run=dry_run)
 
 
 def main():
