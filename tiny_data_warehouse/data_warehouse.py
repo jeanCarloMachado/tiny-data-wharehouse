@@ -2,6 +2,7 @@ import os
 from typing import Optional
 import pandas as pd
 import uuid
+from filelock import FileLock
 
 class DataWarehouse:
     """
@@ -65,37 +66,37 @@ class DataWarehouse:
 
         df = pd.DataFrame([event_data])
 
-        if self._exists_data(event_name):
-            existing_data = self.event(event_name)
+        # Lock around entire read-modify-write cycle to prevent race conditions
+        lock_path = self._parquet_file(event_name) + ".lock"
+        with FileLock(lock_path, timeout=30):
+            if self._exists_data(event_name):
+                existing_data = self.event(event_name)
 
-            if (
-                event_name in self.events_config
-                and "prevent_duplicates_col" in self.events_config[event_name]
-            ):
-                check_column_name = self.events_config[event_name][
-                    "prevent_duplicates_col"
-                ]
-                possible_duplicated_value = event_data[check_column_name]
+                if (
+                    event_name in self.events_config
+                    and "prevent_duplicates_col" in self.events_config[event_name]
+                ):
+                    check_column_name = self.events_config[event_name][
+                        "prevent_duplicates_col"
+                    ]
+                    possible_duplicated_value = event_data[check_column_name]
 
-                # test if in existing_data there is a duplicated value
-                if possible_duplicated_value in existing_data[check_column_name].values:
-                    raise ValueError(
-                        f"A duplicated value {event_data[check_column_name]} for key {check_column_name} was found in the event {event_name}"
-                    )
+                    # test if in existing_data there is a duplicated value
+                    if possible_duplicated_value in existing_data[check_column_name].values:
+                        raise ValueError(
+                            f"A duplicated value {event_data[check_column_name]} for key {check_column_name} was found in the event {event_name}"
+                        )
 
-            df = pd.concat([existing_data, df])
+                df = pd.concat([existing_data, df])
 
-        if not dry_run:
-            self._write_df(event_name, df)
-        else:
-            print(f"Event {event_name} written successfully")
+            if not dry_run:
+                df.to_parquet(self._parquet_file(event_name))
+            else:
+                print(f"Event {event_name} written successfully")
 
         if verbose:
             print(f"Event {event_name} written successfully")
         return tdw_uuid
-
-    def _write_df(self, event_name, df):
-        df.to_parquet(self._parquet_file(event_name))
 
     def _validate_event_data(self, event_data: dict) -> None:
         if type(event_data) != dict:
@@ -114,7 +115,9 @@ class DataWarehouse:
                     event_name
                 )
             )
-        df.to_parquet(self._parquet_file(event_name))
+        lock_path = self._parquet_file(event_name) + ".lock"
+        with FileLock(lock_path, timeout=30):
+            df.to_parquet(self._parquet_file(event_name))
 
     def remove_event(self, event_name: str, dry_run=True) -> None:
         if dry_run:
